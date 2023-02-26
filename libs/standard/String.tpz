@@ -1,0 +1,78 @@
+
+
+import standard/String
+
+StringBuilder||
+	this.buffer = null
+	this.length = 0
+	this.maxlen = 0
+	this.factor = 5
+
+	destroy||
+		if this.buffer isnt null then
+			free(this.buffer)
+			end
+		end
+
+	resize|value|
+		output = malloc(sizeof:char * value)
+		if this.buffer isnt null then
+			memcpy(output, this.buffer, this.length)
+			free(this.buffer)
+			end
+		this.buffer = output
+		this.maxlen = value
+		end
+
+	add_char|value|
+		if this.length is this.maxlen then
+			this.resize(this.maxlen + this.factor + 1)
+			end
+		this.buffer[this.length] = value
+		this.length = this.length + 1
+		end
+
+	add_int|value|
+		if this.length is this.maxlen then
+			this.resize(this.maxlen + this.factor + 24)
+			end
+		intstr = malloc(24)
+		sprintf(intstr, "%d", value)
+		this.concat(intstr)
+		end
+
+	add_float|value|
+		if this.length is this.maxlen then
+			this.resize(this.maxlen + this.factor + 48)
+			end
+		intstr = malloc(48)
+		sprintf(intstr, "%f", value)
+		this.concat(intstr)
+		end
+
+	concat|value|
+		len = strlen(value)
+		if this.length is this.maxlen then
+			this.resize(this.maxlen + len + this.factor)
+			end
+		strcat(this.buffer, value)
+		this.length = this.length + len
+		end
+
+	str||
+		// Add a terminator if there is no '\0'
+		if this.buffer[this.length] isnt '\0' then
+			this.add_char('\0')
+			end
+		return this.buffer
+		end
+	end
+
+String||
+	this = this
+	equals|str|
+		return strcmp(this, str) is 0
+		end
+	end
+
+	

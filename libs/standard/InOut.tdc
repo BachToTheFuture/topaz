@@ -1,0 +1,18 @@
+
+variant print : (int) -> void
+variant print : (float) -> void
+variant print : (char ptr) -> void
+// If you want a class to be able to use print
+// define it yourself here!
+
+print|x| : (int) -> void
+    printf("%d\n", x)
+    end
+
+print|x| : (float) -> void
+    printf("%f\n", x)
+    end
+
+print|x| : (char ptr) -> void
+    printf("%s\n", x)
+    end

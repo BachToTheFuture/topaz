@@ -1,0 +1,81 @@
+
+import standard/String
+
+variant Node|val_type|  :
+	next 			 : this
+	val  			 : val_type
+	func constructor : (val_type) -> void
+	end
+
+// Node has to be first so that you can use it with linkedlist
+Node|val|
+	this.val = val
+	this.next = null
+	end
+
+variant LinkedList|node_type| :
+	head 		       : Node<node_type>
+	length			   : int
+	func constructor   : () -> void
+	func push		   : (node_type) -> this
+	func pop		   : () -> void
+	func get  		   : (node_type) -> node_type
+	func set  		   : (node_type, node_type) -> void
+	func pop  		   : () -> void
+	func on__stringify : () -> char ptr
+	end
+
+LinkedList||
+	this.head = null
+	this.length = 0
+	push|val|
+		node = new Node<typeof(val)>(val)
+		node.next = this.head
+		this.head = node
+		this.length = this.length + 1
+		return this
+		end
+
+	pop||
+		this.head = this.head.next
+		this.length = this.length - 1
+		end
+
+	get|idx|
+		// For some reason the point variable can be
+		// accessed in other methods
+		node = this.head
+		for cur_idx:int = 0, node isnt null do
+			if cur_idx is idx then
+				return node.val
+				end
+			node = node.next
+			end
+		return 0
+		end
+
+	set|idx, val|
+		node = this.head
+		for cur_idx:int = 0, node isnt null do
+			if cur_idx is idx then
+				node.val = val
+				end
+			node = node.next
+			end
+		end
+
+	on__stringify||
+		builder = new StringBuilder()
+		builder.add_char('[')
+		node = this.head
+		while node isnt null do
+			builder.concat(stringify(node.val))
+			if node.next isnt null then
+				builder.concat("->")
+				end
+			node = node.next
+			end
+		builder.concat("]\n")
+		return builder.str()
+		end
+	end

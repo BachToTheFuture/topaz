@@ -1,0 +1,23 @@
+
+import standard/Vector
+
+Vector|x, y|
+    this.x = x
+    this.y = y
+
+    add|vec|
+        this.x = this.x + vec.x
+        this.y = this.y + vec.y
+        return this
+        end
+
+    negate||
+        this.x = this.x * (0 - 1)
+        this.y = this.y * (0 - 1)
+        return this
+        end
+
+    dump||
+        printf("<%d, %d>\n", this.x, this.y)
+        end
+    end

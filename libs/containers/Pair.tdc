@@ -1,0 +1,37 @@
+
+import standard/String
+
+variant Pair|pair_first_type, pair_second_type| :
+	first  : pair_first_type
+	second : pair_second_type
+	func constructor   : (pair_first_type, pair_second_type) -> void
+	func destroy	   : () -> void
+	func on__stringify : () -> string
+	func unpack		   : (pair_first_type ptr, pair_first_type ptr) -> void 
+	end
+
+Pair|first, second|
+	this.first = first
+	this.second = second
+
+	destroy||
+		if this isnt null then
+			free(this)
+			end
+		end
+
+	unpack|a, b|
+		a <== this.first
+		b <== this.second
+		end
+
+	on__stringify||
+		builder = new StringBuilder()
+		return builder.add_char('(')
+			   		  .concat(stringify(this.first))
+			   		  .concat(", ")
+			   		  .concat(stringify(this.second))
+			   		  .add_char(')')
+			   		  .str()
+		end
+	end

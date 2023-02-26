@@ -1,0 +1,109 @@
+
+import standard/String
+import containers/LinkedList
+import containers/List
+
+variant KeyValPair|key_type, val_type| :
+	key : key_type
+	val : val_type
+	func constructor : (key_type, val_type) -> void
+	end
+
+KeyValPair|key, val|
+	this.key = key
+	this.val = val
+	end
+
+
+template dict_val|dict_val_t|:
+	LinkedList<KeyValPair<char ptr, typeof: dict_val_t>>
+
+// Get hash function
+extern djb2_hash : (char ptr) -> int
+
+variant Dictionary|dict_type| :
+	// The following line actually defines and creates functions
+	// for the new type: aka initializing types
+	// Equivalent to "new List<dict_val<dict_type>>()"
+	// but without actually mallocing stuff
+	variant List<dict_val<dict_type>>
+	dtype   : dict_type // Define a default type to return
+	size 	: int
+	buckets : List<dict_val<dict_type>>
+	func constructor : (int) -> void
+	func destroy     : () -> void
+	func hash        : (char ptr) -> int
+	func add		 : (char ptr, dict_type) -> this
+	func get		 : (char ptr) -> dict_type
+	func getptr		 : (char ptr) -> dict_type ptr
+	end
+
+Dictionary|size|
+	this.size = size
+	this.buckets = new List<dict_val<typeof(this.dtype)>>()
+	this.buckets.resize(size) // Size of dict
+
+	destroy||
+		this.buckets.destroy()
+		end
+
+	hash|key|
+		return djb2_hash(key) % this.size
+		end
+
+	add|key, val|
+		kv = new KeyValPair<char ptr, typeof(val)>(key, val)
+		// Check if slot is empty
+		if this.buckets.buffer[this.hash(key)] is null then
+			// If empty, create new linked list
+			this.buckets.buffer[this.hash(key)] = new LinkedList<KeyValPair<char ptr, typeof(val)>>()
+			end
+		lst = this.buckets.buffer[this.hash(key)]
+		lst.push(kv)
+		return this
+		end
+
+	get|key|
+		lst = this.buckets.buffer[this.hash(key)]
+		if lst.length is 1 then
+			return lst.get(0).val
+			end
+		if lst.length > 1 then
+			// Iterate through linked list
+			node = lst.head
+			for cur_idx:int = 0, node isnt null do
+				// Change to String so I can do strcmp
+				s : String = node.val.key
+				if s.equals(key) then
+					return node.val.val
+					end
+				node = node.next
+				end
+			end
+		return this.dtype
+		end
+
+	getptr|key|
+		lst = this.buckets.buffer[this.hash(key)]
+		if lst.length is 1 then
+			return ref lst.get(0).val
+			end
+		if lst.length > 1 then
+			// Iterate through linked list
+			node = lst.head
+			for cur_idx:int = 0, node isnt null do
+				// Change to String so I can do strcmp
+				s : String = node.val.key
+				if s.equals(key) then
+					return ref node.val.val
+					end
+				node = node.next
+				end
+			end
+		return null
+		end
+
+	end
+
+
+

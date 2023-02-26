@@ -1,0 +1,38 @@
+
+//
+// Vector example
+//
+
+func main : () -> int
+
+class Vector :
+    x : int
+    y : int
+    func constructor : (int, int) -> void
+    func add : (Vector) -> Vector
+		func str : () -> char ptr
+		end
+
+Vector|x, y|
+		this.x = x
+    this.y = y
+
+		add|vec|
+				z = new Vector(this.x + vec.x, this.y + vec.y)
+        return z
+        end
+
+		str||
+				s = malloc(32)
+        sprintf(s, "<%d, %d>", this.x, this.y)
+				return s
+        end
+
+		end
+
+main||
+    x = new Vector(3, 5)
+		y = new Vector(8, 10)
+		printf("%s\n", x.add(y).str())
+		// Prints out <11, 15>
+    end

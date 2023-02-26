@@ -1,0 +1,30 @@
+
+extern free : (void ptr) -> void
+extern malloc : (int) -> void ptr
+extern memcpy : (char ptr, char ptr, int) -> char ptr
+extern strlen : (char ptr) -> int
+extern strcat : (char ptr, char ptr) -> char ptr
+extern strcmp : (char ptr, char ptr) -> int
+
+class StringBuilder :
+	buffer : char ptr
+	length : int
+	maxlen : int
+	factor : int
+	func constructor : () -> void
+	func destroy     : () -> void
+	func resize		 : (int) -> void
+	func add_char	 : (char) -> this
+	func add_int	 : (int) -> this
+	func add_float	 : (float) -> this
+	func concat  	 : (char ptr) -> this
+	func str  		 : () -> char ptr
+	end
+
+class String :
+	this        : this
+	func constructor : () -> void 
+	func equals : (char ptr) -> bool
+	end
+
+

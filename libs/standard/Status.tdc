@@ -1,0 +1,54 @@
+
+import standard/String
+
+class Status :
+	status  : int
+	message : string
+	variant constructor : (int) -> void
+	variant constructor : (int, char ptr) -> void
+	func destroy : () -> void
+	func ok : () -> bool
+	func failed : () -> bool
+	func assert_ok : () -> void
+	end
+
+Status : class
+	constructor|status| : (int) -> void
+		this.status = status
+		this.message = null
+		end
+	constructor|status, msg| : (int, char ptr) -> void
+		this.status = status
+		this.message = msg
+		end
+	destroy||
+		if this isnt null then
+			free(this)
+			end
+		end
+	ok||
+		return this.status is 0
+		end
+	failed||
+		return this.status is 1
+		end
+	assert_ok||
+		if this.status is 1 then
+			printf("[Error] %s\m", this.message)
+			end
+		this.destroy()
+		end
+	end
+
+test|x, l| : (bool, int) -> Status
+	if x then
+		return new Status(0)
+		end
+	builder = new StringBuilder()
+	msg = builder.concat("FAILED TEST @ line ")
+		         .add_int(l)
+		         .add_char('\n')
+		         .str()
+	builder.destroy()
+	return new Status(1, msg)
+	end

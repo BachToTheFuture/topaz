@@ -1,0 +1,80 @@
+
+import standard/String
+
+variant List|list_type| :
+	buffer : list_type ptr
+	ttype  : list_type
+	length : int
+	maxlen : int
+	factor : int
+	func constructor   : () -> void
+	func get   		     : (int) -> list_type
+	func getptr		     : (int) -> list_type ptr
+	func destroy       : () -> void
+	func resize		     : (int) -> void
+	func append        : (list_type) -> this
+	func on__bracket   : (int) -> list_type
+	func on__stringify : () -> string
+	end
+
+List||
+	this.ttype = 0
+	this.buffer = malloc(5 * sizeof(this.ttype))
+	this.length = 0
+	this.maxlen = 5
+	this.factor = 0
+
+	destroy||
+		if this isnt null then
+			free(this)
+			end
+		end
+
+	get|idx|
+		return this.buffer[idx]
+		end
+
+	getptr|idx|
+		return this.buffer[idx]
+		end 
+
+	resize|value|
+		// Don't forget to multiply length by size of element type!
+		output = malloc(value * sizeof(this.ttype))
+		if this.buffer isnt null then
+			memcpy(output, this.buffer, this.length * sizeof(this.ttype))
+			free(this.buffer)
+			end
+		this.buffer = output
+		this.maxlen = value
+		end
+
+	append|value|
+		if this.length is this.maxlen then
+			// Everytime it needs space double the space needed
+			this.resize(this.maxlen * 2)
+			end
+		this.buffer[this.length] = value
+		this.length = this.length + 1
+		return this
+		end
+
+	on__bracket|idx|
+		return this.buffer[idx]
+		end
+
+	on__stringify||
+		builder = new StringBuilder()
+		builder.add_char('[')
+		for i : int = 0, i < this.length do
+			builder.concat(stringify(this.buffer[i]))
+			if i < this.length - 1 then
+				builder.concat(", ")
+				end
+			end
+		builder.add_char(']')
+		str = builder.str()
+		builder.destroy()
+		return str
+		end
+	end

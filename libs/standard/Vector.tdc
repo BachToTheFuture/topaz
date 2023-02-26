@@ -1,0 +1,11 @@
+
+class Vector :
+    x : int
+    y : int
+    func constructor : (int, int) -> void
+    func add : (Vector) -> Vector
+    func negate : () -> Vector
+    func dump : () -> void
+    end
+
+func main : () -> int

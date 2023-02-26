@@ -1,0 +1,125 @@
+
+import standard/String
+import containers/PolyList
+
+PolyListElem|ty, val|
+	this.ty = ty
+	this.val = val
+	end
+
+PolyList||
+	this.buffer = new List<PolyListElem>()
+	this.int_ty = 0
+	this.float_ty = 1
+	this.str_ty = 2
+	this.obj_ty = 3
+
+	get_type|idx|
+		ty = this.buffer.get(idx).ty
+		if ty is this.int_ty then
+			return "int"
+			end
+		if ty is this.float_ty then
+			return "float"
+			end
+		if ty is this.str_ty then
+			return "string"
+			end
+		if ty is this.obj_ty then
+			return "pointer"
+			end
+		end
+
+	add_int|num|
+		temp = new int()
+		temp <== num
+		elem = new PolyListElem(this.int_ty, temp)
+		this.buffer.append(elem)
+		return this
+		end
+
+	get_int|idx|
+		elem = this.buffer.get(idx)
+		if elem.ty isnt this.int_ty then
+			printf("Expected int but element is type %s\n", this.get_type(idx))
+			return 0
+			end
+		loc : int ptr = elem.val
+		return at loc
+		end
+
+	add_float|num|
+		temp = new float()
+		temp <== num
+		elem = new PolyListElem(this.float_ty, temp)
+		this.buffer.append(elem)
+		return this
+		end
+
+	get_float|idx|
+		elem = this.buffer.get(idx)
+		if elem.ty isnt this.float_ty then
+			printf("Expected float but element is type %s\n", this.get_type(idx))
+			return 0
+			end
+		loc : float ptr = elem.val
+		return at loc
+		end
+
+	add_str|str|
+		elem = new PolyListElem(this.str_ty, str)
+		this.buffer.append(elem)
+		return this
+		end
+
+	get_str|idx|
+		elem = this.buffer.get(idx)
+		if elem.ty isnt this.str_ty then
+			printf("Expected string but element is type %s\n", this.get_type(idx))
+			return 0
+			end
+		return elem.val
+		end
+
+	add_obj|p|
+		elem = new PolyListElem(this.obj_ty, p)
+		this.buffer.append(elem)
+		return this
+		end
+
+	get_obj|idx|
+		elem = this.buffer.get(idx)
+		if elem.ty isnt this.obj_ty then
+			printf("Expected object but element is type %s\n", this.get_type(idx))
+			return 0
+			end
+		return elem.val
+		end
+
+	str||
+		builder = new StringBuilder()
+		builder.add_char('[')
+		for i : int = 0, i < this.buffer.length do
+			if this.buffer[i].ty is this.int_ty then
+				builder.add_int(this.get_int(i))
+				end
+			if this.buffer[i].ty is this.float_ty then
+				builder.add_float(this.get_float(i))
+				end
+			if this.buffer[i].ty is this.str_ty then
+				builder.add_char('"')
+				builder.concat(this.get_str(i))
+				builder.add_char('"')
+				end
+			if this.buffer[i].ty is this.obj_ty then
+				builder.concat("<object>")
+				end
+			if i < this.buffer.length - 1 then
+				builder.concat(", ")
+				end
+			end
+		builder.add_char(']')
+		str = builder.str()
+		return str
+		end
+	end

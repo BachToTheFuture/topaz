@@ -1,0 +1,28 @@
+
+import containers/List
+
+class PolyListElem :
+	ty  : int
+	val	: void ptr
+	func constructor : (int, void ptr) -> void
+	end
+
+class PolyList :
+	buffer   : List<PolyListElem> // Don't create body for this yet
+	int_ty   : int 				  // Wait until allocating with new
+	float_ty : int
+	str_ty   : int
+	obj_ty   : int
+	func constructor : () -> void
+	func get_type    : (int) -> char ptr
+	func add_int     : (int) -> this
+	func add_float   : (float) -> this
+	func add_str     : (char ptr) -> this
+	func add_obj     : (void ptr) -> this
+	func get_int 	 : (int) -> int
+	func get_float   : (int) -> float
+	func get_str 	 : (int) -> char ptr
+	func get_obj     : (int) -> void ptr
+	func str 		 : () -> char ptr
+	end
+	

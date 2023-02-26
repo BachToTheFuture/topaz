@@ -1,0 +1,638 @@
+
+
+// Basic class example
+Test|a|
+    this.a = a
+    test||
+        printf("hello world! %d", this.a)
+        end
+    end
+
+main||
+    y:Test = new Test(30)
+    put(y.a)
+    y.test()
+    end
+
+// Array initializing
+
+func main : () -> int
+
+main||
+    arr : int[3]
+    for i : int = 0, i < 3 do
+        arr[i] = 100
+        end
+    end
+
+
+// Wrapper class example
+
+class Integer    :
+    this         : int // Required to specify type of this...
+    func double  : () -> int
+    end
+
+Integer.double||
+    return this * 2
+    end
+
+main|| : () -> int
+    x : Integer = 10
+    put(x.double())
+    end
+
+// Templates, and "inheritance"
+template Vector|t_A| :
+    x : t_A
+    y : t_A
+    func constructor : (t_A, t_A) -> void
+    end
+
+class IntVector : Vector(int)
+class FloatVector : Vector(float)
+
+main|| : () -> int
+    end
+
+
+// Linked List example
+
+import standard/LinkedList
+
+main|| : () -> int
+    list = new IntLinkedList()
+    list.push(1).push(2).push(3)
+    list.dump()
+    end
+
+variant Vector|vector_type| :
+    x : vector_type
+    y : vector_type
+    func constructor : (vector_type, vector_type) -> void
+    func test : () -> vector_type
+    end
+
+Vector|x, y|
+    this.x = x
+    this.y = y
+    test||
+        return this.x
+        end
+    end
+
+main|| : () -> int
+    intvec = new Vector(int)(1,2)
+    fltvec = new Vector(float)(5.2,2.7)
+    
+    printf("%f\n", fltvec.test())
+    end
+
+
+// With templates, you have to write new classes for each type.
+template vector|v_type| :
+    x : v_type
+    y : v_type
+    func constructor : (v_type, v_type) -> void
+    end
+
+class Vector : vector<int>
+class FloatVector : vector<float>
+
+
+variant Node|n_type| :
+    next : this // Get the class type itself! Autoupdates with variant
+    val  : n_type
+    func constructor : (n_type) -> void
+    end
+
+Node|val|
+    this.val = val
+    end
+
+main|| : () -> int
+    n = new Node<int>(3)
+    end
+
+
+func main : () -> int
+
+variant Vector|v_type| :
+    x : v_type
+    y : v_type
+    func constructor : (v_type, v_type)->void
+    func add_scalar  : (v_type)->void
+    end
+
+Vector|x, y|
+    this.x = x
+    this.y = y
+    add_scalar|num|
+        this.x = this.x + num
+        this.y = this.y + num
+        end
+    end
+
+main||
+    vec = new Vector<int>(1,2)
+    vec.add_scalar(5)
+    put(vec.x)
+    put(vec.y)
+    vec2 = new Vector<float>(14.52, 6.3)
+    vec2.add_scalar(4.4)
+    printf("%.2f\n", vec2.x)
+    printf("%.2f\n", vec2.y)
+    end
+
+
+// String example
+
+extern free : (void ptr) -> void
+extern malloc : (int) -> void ptr
+extern memcpy : (char ptr, char ptr, int) -> char ptr
+
+func main : () -> int
+
+class String :
+    buffer : char ptr
+    length : int
+    maxlen : int
+    factor : int
+    func constructor : () -> void
+    func destroy     : () -> void
+    func resize      : (int) -> void
+    func add_char    : (char) -> void
+    end
+
+String||
+    this.buffer = null
+    this.length = 0
+    this.maxlen = 0
+    this.factor = 0
+
+    destroy||
+        if this isnt null then
+            free(this)
+            end
+        end
+
+    resize|value|
+        output = malloc(value)
+        memcpy(output, this.buffer, this.length)
+        free(this.buffer)
+        this.buffer = output
+        this.maxlen = value
+        end
+
+    add_char|value|
+        if this.length is this.maxlen then
+            this.resize(this.maxlen + this.factor)
+            end
+        this.buffer[this.length] = value
+        this.length = this.length + 1
+        end
+    end
+
+main||
+    x = new String()
+    x.add_char('A')
+    x.add_char('B')
+    x.add_char('C')
+    x.add_char('\n')
+    printf(x.buffer)
+    x.destroy()
+    end
+
+// String example 2
+import standard/String
+
+main||
+    x = new StringBuilder()
+    x.concat("Hello ").concat("world!\n")
+    printf(x.str())
+    printf("The string length is %d\n", x.length)
+    x.destroy()
+    end
+
+
+// String example
+import standard/String
+
+// Why is the error not showing when i dont declare signature
+main|| : () -> int
+    // Build a string
+    builder = new StringBuilder()
+    builder.concat("Hello ").concat("world!\n")
+    // Set type to String to get access to string specific methods
+    x : String = builder.str()
+    y : String = "Hello world!\n"
+    end
+
+
+
+// Custom bracket operator!!!
+extern malloc : (int) -> void ptr
+
+class Triple :
+    buf      : int ptr
+    func constructor : (int, int, int) -> void
+    func op__bracket : (int) -> int
+    end
+
+Triple|a, b, c|
+    this.buf = malloc(3)
+    this.buf[0] = a
+    this.buf[1] = b
+    this.buf[2] = c
+    op__bracket|idx|
+        return this.buf[idx]
+        end
+    end
+
+main|| : () -> int
+    x = new Triple(1,2,3)
+    printf("%d, %d, %d\n", x[0], x[1], x[2])
+    end
+
+
+variant print : (int) -> void
+variant print : (float) -> void
+
+func test : () -> void
+
+test||
+    printf("ASDKFJA\n")
+    end
+
+print|x| : (int) -> void
+    printf("%d\n", x)
+    end
+
+print|x| : (float) -> void
+    printf("%f\n", x)
+    end
+
+main|| : () -> int
+    print(3)
+    print(4.62)
+    test()
+    end
+
+
+// Variant example with classes!!!!
+
+class Test :
+    a : int
+    variant constructor : (int) -> void
+    variant constructor : () -> void
+    variant get         : () -> int
+    variant get         : (int) -> int
+    func some_func      : () -> void
+    end
+
+Test.constructor|| : () -> void
+    this.a = 0
+    end
+
+Test.constructor|val| : (int) -> void
+    this.a = val
+    end
+
+Test.get|| : () -> int
+    return this.a
+    end
+
+Test.get|| : (int) -> int
+    printf("Oops?")
+    return 0
+    end
+
+Test.some_func||
+    printf("HELLLALSDLF\n")
+    end
+
+main|| : () -> int
+    test1 = new Test(3)
+    test2 = new Test()
+
+    printf("%d\n", test1.get())
+    printf("%d\n", test2.get(3))
+
+    test1.some_func()
+    end
+
+
+import standard/String
+import standard/List
+
+main|| : () -> int
+    lst = new List<int>()
+    // A list of 1-10000 just because i can lol
+    for i:int = 0, i < 10000 do
+        lst.append(i)
+        end
+    printf(lst.str())
+
+    // Create a list of names too
+    names = new List<char ptr>()
+    names.append("Bob")
+    names.append("Charlie")
+    names.append("Alice")
+    printf(names.str())
+    end
+
+
+//
+// Linked list example
+//
+
+import standard/String
+import standard/LinkedList
+
+main|| : () -> int
+    // Int
+    intlst = new LinkedList<int>()
+    intlst.push(1)
+          .push(2)
+          .push(3)
+    printf(intlst.str())
+
+    // String example
+    strlst = new LinkedList<char ptr>()
+    strlst.push("Hi")
+          .push("Bye")
+          .push("Hii")
+    printf(strlst.str())
+    printf(strlst.get(1))
+
+    end
+
+
+// More dict examples
+
+import containers/Dictionary
+
+main|| : () -> int
+    dict = new Dictionary<int>(10)
+    dict.add("Bob", 3)
+        .add("Alice", 5)
+        .add("Charlie", 10)
+        .add("Charles", 15)
+
+    printf("Bob has %d apples.\n", dict.get("Bob"))
+    printf("Alice has %d apples.\n", dict.get("Alice"))
+    printf("Charlie has %d apples.\n", dict.get("Charlie"))
+    printf("Charles used to have %d apples.\n", dict.get("Charles"))
+
+    // Try changing value?
+    dict.getptr("Charles") <== 40
+    printf("Charles now has %d apples.\n", dict.get("Charles"))
+
+    dict.destroy()
+    return 0
+    end
+
+
+
+// More dict examples
+import standard/Dictionary
+
+main|| : () -> int
+    phonebook = new Dictionary<char ptr>(10)
+    phonebook.add("emergency", "911")
+             .add("hospital", "141-525-2635")
+             .add("school", "142-636-2425")
+             .add("office", "526-367-2524")
+
+    printf("Number for school is %s\n", phonebook.get("school"))
+    phonebook.destroy()
+    return 0
+    end
+
+
+
+// Command line arguments!!
+
+main|argc, argv| : (int, char ptr ptr) -> int
+    // Print out arguments!
+    for i:int = 1, i < argc do
+        printf("%s\n", argv[i])
+        end
+    return 0
+    end
+
+
+// Pointer example
+
+main|| : () -> int
+    x = 10
+    y ==> x // y points to x
+    y <== 4 // Store 4 at pointer y
+    printf("%d\n", x)
+    return 0
+    end
+
+
+// PolyList example
+import standard/String
+import containers/PolyList
+import standard/InOut
+
+main|| : () -> int
+    lst = new PolyList()
+    lst.add_int(4)
+       .add_float(6.52)
+       .add_str("Hello world!")
+       .add_int(60)
+
+    printf(lst.str())
+    return 0
+    end
+
+// PolyList example with adding objects
+
+import standard/String
+import containers/PolyList
+import standard/InOut
+
+class Test :
+    x : int
+    y : int
+    func constructor : (int, int) -> void
+    end
+
+Test|x, y|
+    this.x = x
+    this.y = y
+    end
+
+main|| : () -> int
+    lst = new PolyList()
+
+    lst.add_int(4)
+       .add_float(6.52)
+       .add_str("Hello world!")
+       .add_int(60)
+       .add_obj(new Test(3,4))
+
+    // You can even store objects
+    // Although problem is the user
+    // keeps track
+    x : Test = lst.get_obj(4)
+    print(x.x)
+    print(x.y)
+
+    printf(lst.str())
+    return 0
+    end
+
+
+// New way to use "new"
+import containers/List
+
+main|| : () -> int
+    lst = new List<void ptr>()
+    t = new int()
+    t <== 4
+    lst.append(t)
+
+    return 0
+    end
+
+
+// Pointer example
+main||
+    x = 10
+    y ==> x // y points to x
+    y <== 4 // Store 4 at pointer y
+    printf("%d\n", x)
+
+		// Compare the value of y and the address of x
+		printf("%x %x\n", ref x, y)
+    return 0
+    end
+
+// Example of print function
+// And new types
+
+import containers/List
+import containers/Pair
+
+type Point : Pair<int, int>
+type PointList : List<Point>
+
+main|| : () -> int
+    lst = new PointList()
+    lst.append(new Point(3,5))
+       .append(new Point(6,8))
+       .append(new Point(2,10))
+    
+    // Unpacking demo
+    x : int
+    y : int
+    lst.get(1).unpack(ref x, ref y)
+
+    printf("x and y are %d and %d\n", x, y)
+
+    return 0
+    end
+
+
+
+import containers/Pair
+import containers/Dictionary
+
+extern sqrt : (float) -> float
+
+type Point : Pair<int, int>
+
+square|x| : (int) -> int
+    return x * x
+    end
+
+distance|p1, p2| : (Point, Point) -> float
+    x2 = square(p2.first - p1.first)
+    y2 = square(p2.second - p1.second)
+    operand = x2 + y2
+    return sqrt(operand as float)
+    end
+
+main|| : () -> int
+    p1 = new Point(0,0)
+    p2 = new Point(3,4)
+
+    points = new Dictionary<Point>()
+    points.add("A", p1)
+    points.add("B", p2)
+
+    printf("Point A is %s\n", stringify(points.get("A")))
+    printf("Point B is %s\n", stringify(points.get("B")))
+    printf("Distance from A to B is %.2f\n",
+        distance(points.get("A"), points.get("B")))
+    return 0
+    end
+
+
+// Simple "inheritance"
+
+import containers/LinkedList
+
+variant LinkedList<int>
+
+// Stack inherits integer linked list
+type Stack : LinkedList<int>
+
+Stack func top|| : () -> int
+    return this.get(0)
+    end
+
+main|| : () -> int
+    stack = new Stack()
+    stack.push(1).push(2).push(3)
+    print(stack.top())
+    return 0
+    end
+
+
+// Status example and error checking
+import standard/String
+import standard/Status
+
+test|x| : (int) -> Status
+    if x is 3 then
+        return new Status(0)
+        end
+    return new Status(1, "Expected x = 3\n")
+    end
+
+main|| : () -> int
+    status = test(4, line)
+    status.assert_ok()
+    return 0
+    end
+
+// Working matrix!!
+
+extern malloc : (int) -> void ptr
+extern free : (void ptr) -> void
+
+main|| : () -> int
+    mtx = {{1, 2, 3},
+           {4, 5, 6},
+           {7, 8, 9}}
+    printf("%d\n", mtx[1][2])
+    free(mtx)
+    return 0
+    end
+
+
+main|| : () -> int
+    test = {1, 2, 3}
+    size = 0
+    for i:int = 0, test[i] isnt null do
+    	size = size + 1
+    	end
+    printf("Size of this array is %d\n", size)
+    return 0
+    end
+
